@@ -11,7 +11,7 @@ export function KnowledgeAreaCard({ area, onClick }: KnowledgeAreaCardProps) {
   return (
     <button
       onClick={onClick}
-      className="bg-[#1a1a1a] text-left px-5 py-4 rounded-lg hover:bg-[#333333] transition-all cursor-pointer group hover:shadow-lg border border-transparent hover:border-gray-700 active:scale-95"
+      className="bg-[#1a1a1a] text-left px-5 py-4 rounded-lg hover:bg-[#252525] transition-all cursor-pointer group hover-lift border border-[#333] hover:border-purple-500/30 active:scale-95"
     >
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3">

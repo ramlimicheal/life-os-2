@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
+import { auth } from "@clerk/nextjs/server";
+import { checkRateLimit, getRateLimitHeaders } from "@/lib/rateLimit";
 
 const searchSchema = z.object({
   query: z.string().min(1),
@@ -15,6 +17,20 @@ interface GroundingChunk {
 
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimitResult = checkRateLimit(userId, "ai_search");
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again later." },
+        { status: 429, headers: getRateLimitHeaders(rateLimitResult) }
+      );
+    }
+
     const body = await request.json();
     const { query } = searchSchema.parse(body);
 

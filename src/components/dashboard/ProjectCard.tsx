@@ -25,7 +25,7 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
   return (
     <div
       onClick={onClick}
-      className="bg-[#1a1a1a] border-none p-4 rounded-md hover:bg-[#333333] transition-all cursor-pointer group"
+      className="bg-[#1a1a1a] border border-[#333] p-4 rounded-md hover:bg-[#252525] transition-all cursor-pointer group hover-lift"
     >
       <div className="flex items-start gap-2 mb-2">
         <div className="w-2 h-2 rounded-full bg-gray-500 mt-1.5 flex-shrink-0 group-hover:bg-white transition-colors" />
