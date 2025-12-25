@@ -1,22 +1,42 @@
 {
-  "name": "life-2.0-dashboard",
+  "name": "life-os-2",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "@google/genai": "^1.34.0"
+    "@clerk/nextjs": "^6.12.0",
+    "@google/genai": "^1.34.0",
+    "@prisma/client": "^6.2.1",
+    "@tiptap/extension-placeholder": "^2.11.5",
+    "@tiptap/pm": "^2.11.5",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.469.0",
+    "next": "16.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "prisma": "^6.2.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

@@ -49,7 +49,15 @@ export const searchGrounding = async (query: string) => {
   });
 
   const text = response.text;
-  const sources = response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((chunk: any) => ({
+
+  interface GroundingChunk {
+    web?: {
+      title?: string;
+      uri?: string;
+    };
+  }
+
+  const sources = response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((chunk: GroundingChunk) => ({
     title: chunk.web?.title || "Source",
     uri: chunk.web?.uri || "#"
   })) || [];
