@@ -8,7 +8,7 @@ import {
   RefreshCw,
   FolderOpen,
   Edit,
-  Hub,
+  Network,
   Plus,
   Download,
 } from "lucide-react";
@@ -433,10 +433,10 @@ export default function DashboardPage() {
               </Button>
             </div>
 
-            <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-[#333] pb-3 mb-6 tracking-wide">
-              <Hub className="w-5 h-5" />
-              knowledge lab
-            </h2>
+                        <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-[#333] pb-3 mb-6 tracking-wide">
+                          <Network className="w-5 h-5" />
+                          knowledge lab
+                        </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {knowledgeAreas.map((area) => (
