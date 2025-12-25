@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notes          Note[]
+  projects       Project[]
+  knowledgeAreas KnowledgeArea[]
+
+  @@index([clerkId])
+}
+
+model Note {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?
+  type        NoteType @default(NOTE)
+  icon        String   @default("description")
+  iconColor   String?
+  tags        String?  // JSON array of tags
+  aiGenerated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  knowledgeAreaId String?
+  knowledgeArea   KnowledgeArea? @relation(fields: [knowledgeAreaId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([knowledgeAreaId])
+  @@index([createdAt])
+}
+
+model Project {
+  id             String          @id @default(cuid())
+  title          String
+  description    String?
+  category       ProjectCategory @default(PERSONAL)
+  creationsCount Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes  Note[]
+
+  @@index([userId])
+}
+
+model KnowledgeArea {
+  id               String   @id @default(cuid())
+  title            String
+  icon             String   @default("psychology")
+  disciplinesCount Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes  Note[]
+
+  @@index([userId])
+}
+
+enum NoteType {
+  NOTE
+  ARTICLE
+  PHOTOGRAPH
+  VIDEO
+  LINK
+}
+
+enum ProjectCategory {
+  BUSINESS
+  ACADEMIC
+  PERSONAL
+}
