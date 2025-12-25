@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { useToast } from "@/components/ui/Toast";
 
 const ICONS = [
   { value: "psychology", label: "Psychology" },
@@ -33,6 +34,7 @@ export function CreateKnowledgeAreaModal({
   onClose,
   onCreated,
 }: CreateKnowledgeAreaModalProps) {
+  const { addToast } = useToast();
   const [title, setTitle] = useState("");
   const [icon, setIcon] = useState("psychology");
   const [isCreating, setIsCreating] = useState(false);
@@ -52,9 +54,13 @@ export function CreateKnowledgeAreaModal({
         resetForm();
         onCreated();
         onClose();
+      } else {
+        const data = await res.json();
+        addToast(data.error || "Failed to create knowledge area", "error");
       }
     } catch (error) {
       console.error("Failed to create knowledge area:", error);
+      addToast("Failed to create knowledge area. Please try again.", "error");
     } finally {
       setIsCreating(false);
     }

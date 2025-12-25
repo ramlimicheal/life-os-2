@@ -59,6 +59,8 @@ export default function TeamsPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"ADMIN" | "MEMBER" | "VIEWER">("MEMBER");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [showTeamMenu, setShowTeamMenu] = useState<string | null>(null);
 
   const fetchTeams = useCallback(async () => {
     try {
@@ -160,6 +162,11 @@ export default function TeamsPage() {
     setIsInviteModalOpen(true);
   };
 
+  const openSettingsModal = (team: Team) => {
+    setSelectedTeam(team);
+    setIsSettingsModalOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -221,9 +228,32 @@ export default function TeamsPage() {
                     </p>
                   </div>
                 </div>
-                <button className="p-1.5 text-gray-500 hover:text-white hover:bg-[#252525] rounded transition-colors">
-                  <MoreVertical className="w-4 h-4" />
-                </button>
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowTeamMenu(showTeamMenu === team.id ? null : team.id)}
+                    className="p-1.5 text-gray-500 hover:text-white hover:bg-[#252525] rounded transition-colors"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                  {showTeamMenu === team.id && (
+                    <div className="absolute right-0 mt-1 w-40 bg-[#252525] border border-[#333] rounded-lg shadow-xl z-10 py-1">
+                      <button 
+                        onClick={() => { openSettingsModal(team); setShowTeamMenu(null); }}
+                        className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-[#333] hover:text-white flex items-center gap-2"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Settings
+                      </button>
+                      <button 
+                        onClick={() => { openInviteModal(team); setShowTeamMenu(null); }}
+                        className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-[#333] hover:text-white flex items-center gap-2"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        Invite Member
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {team.description && (
@@ -270,7 +300,7 @@ export default function TeamsPage() {
                   <UserPlus className="w-4 h-4 mr-1" />
                   Invite
                 </Button>
-                <Button variant="secondary" size="sm">
+                <Button variant="secondary" size="sm" onClick={() => openSettingsModal(team)}>
                   <Settings className="w-4 h-4" />
                 </Button>
               </div>
@@ -379,6 +409,80 @@ export default function TeamsPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        title={`${selectedTeam?.name || "Team"} Settings`}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              Team Name
+            </label>
+            <Input
+              value={selectedTeam?.name || ""}
+              disabled
+              className="opacity-60"
+            />
+            <p className="text-xs text-gray-500 mt-1">Team name cannot be changed yet.</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              Description
+            </label>
+            <textarea
+              value={selectedTeam?.description || ""}
+              disabled
+              className="w-full px-3 py-2 bg-[#252525] border border-[#333] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none opacity-60"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              Members ({selectedTeam?._count.members || 0})
+            </label>
+            <div className="bg-[#252525] border border-[#333] rounded-lg p-3 max-h-40 overflow-y-auto">
+              {selectedTeam?.members.map((member) => (
+                <div key={member.id} className="flex items-center justify-between py-2 border-b border-[#333] last:border-0">
+                  <div className="flex items-center gap-2">
+                    {member.user.imageUrl ? (
+                      <img src={member.user.imageUrl} alt={member.user.name || "Member"} className="w-6 h-6 rounded-full" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs">
+                        {(member.user.name || member.user.email)[0].toUpperCase()}
+                      </div>
+                    )}
+                    <span className="text-sm text-gray-300">{member.user.name || member.user.email}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    {getRoleIcon(member.role)}
+                    <span>{member.role}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              className="flex-1"
+              onClick={() => setIsSettingsModalOpen(false)}
+            >
+              Close
+            </Button>
+            <Button
+              type="button"
+              className="flex-1"
+              onClick={() => { openInviteModal(selectedTeam!); setIsSettingsModalOpen(false); }}
+            >
+              <UserPlus className="w-4 h-4 mr-1" />
+              Invite Member
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
