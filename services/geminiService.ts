@@ -29,9 +29,9 @@ export const processAICommand = async (command: string) => {
     }
   });
 
-  try {
-    return JSON.parse(response.text.trim());
-  } catch (e) {
+    try {
+      return JSON.parse((response.text || "").trim());
+    } catch (e) {
     console.error("Failed to parse AI response", e);
     return null;
   }
@@ -48,9 +48,9 @@ export const searchGrounding = async (query: string) => {
     },
   });
 
-  const text = response.text;
+    const text = response.text || "";
 
-  interface GroundingChunk {
+    interface GroundingChunk {
     web?: {
       title?: string;
       uri?: string;

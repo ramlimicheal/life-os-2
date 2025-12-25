@@ -1,5 +1,8 @@
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+
+export const dynamic = "force-dynamic";
 
 export default function DashboardLayout({
   children,
@@ -17,17 +20,22 @@ export default function DashboardLayout({
           <span className="text-gray-600 material-symbols-outlined text-[10px]">lock</span>
           <span>Secured</span>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="cursor-pointer hover:text-white transition-colors">Share</span>
-          <span className="material-symbols-outlined text-[16px] cursor-pointer hover:text-white transition-colors">
-            chat_bubble
-          </span>
-          <span className="material-symbols-outlined text-[16px] cursor-pointer hover:text-white transition-colors">
+        <nav className="hidden md:flex items-center gap-6">
+          <Link href="/dashboard" className="hover:text-white transition-colors">
+            Dashboard
+          </Link>
+          <Link href="/teams" className="hover:text-white transition-colors">
+            Teams
+          </Link>
+          <Link href="/admin" className="hover:text-white transition-colors">
+            Admin
+          </Link>
+        </nav>
+        <div className="flex items-center gap-3">
+          <NotificationDropdown />
+          <Link href="/profile" className="material-symbols-outlined text-[16px] cursor-pointer hover:text-white transition-colors">
             settings
-          </span>
-          <span className="material-symbols-outlined text-[16px] cursor-pointer hover:text-white transition-colors">
-            star
-          </span>
+          </Link>
           <UserButton
             appearance={{
               elements: {

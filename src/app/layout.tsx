@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/ui/Toast";
+import { AnalyticsProvider } from "@/components/Analytics";
 import "./globals.css";
+
+export const dynamic = "force-dynamic";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,9 +32,10 @@ export default function RootLayout({
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
           />
         </head>
-        <body className={`${inter.variable} font-sans antialiased bg-[#0a0a0a] text-gray-300`}>
-          <ToastProvider>{children}</ToastProvider>
-        </body>
+                <body className={`${inter.variable} font-sans antialiased bg-[#0a0a0a] text-gray-300`}>
+                  <ToastProvider>{children}</ToastProvider>
+                  <AnalyticsProvider />
+                </body>
       </html>
     </ClerkProvider>
   );
