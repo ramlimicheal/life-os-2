@@ -53,6 +53,10 @@ export default function DashboardPage() {
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [isCreateKnowledgeAreaOpen, setIsCreateKnowledgeAreaOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [activeNavFilter, setActiveNavFilter] = useState<string | null>(null);
+  const [knowledgeViewMode, setKnowledgeViewMode] = useState<"areas" | "disciplines" | "research">("areas");
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const fetchNotes = useCallback(async () => {
     try {
@@ -281,27 +285,45 @@ export default function DashboardPage() {
         </div>
 
         <nav className="flex flex-wrap items-center gap-8 md:gap-12 py-4 nav-border text-[11px] font-medium tracking-widest text-gray-500">
-          <button className="flex items-center gap-2 hover:text-white transition-colors group active:text-white">
+          <button 
+            onClick={() => { setActiveNavFilter(activeNavFilter === "library" ? null : "library"); addToast("Filtering by Library", "info"); }}
+            className={`flex items-center gap-2 hover:text-white transition-colors group ${activeNavFilter === "library" ? "text-white" : ""}`}
+          >
             <span className="material-symbols-outlined text-[16px] text-yellow-600/80 group-hover:scale-110 transition-transform">library_books</span>
             library
           </button>
-          <button className="flex items-center gap-2 text-purple-400/80 hover:text-white transition-colors group">
+          <button 
+            onClick={() => { setActiveNavFilter(activeNavFilter === "university" ? null : "university"); addToast("Filtering by University", "info"); }}
+            className={`flex items-center gap-2 hover:text-white transition-colors group ${activeNavFilter === "university" ? "text-purple-400" : ""}`}
+          >
             <span className="material-symbols-outlined text-[16px] text-purple-500 group-hover:scale-110 transition-transform">school</span>
             university
           </button>
-          <button className="flex items-center gap-2 hover:text-white transition-colors group">
+          <button 
+            onClick={() => { setActiveNavFilter(activeNavFilter === "business" ? null : "business"); addToast("Filtering by Business", "info"); }}
+            className={`flex items-center gap-2 hover:text-white transition-colors group ${activeNavFilter === "business" ? "text-white" : ""}`}
+          >
             <span className="material-symbols-outlined text-[16px] text-red-800/80 group-hover:scale-110 transition-transform">business_center</span>
             business
           </button>
-          <button className="flex items-center gap-2 hover:text-white transition-colors group">
+          <button 
+            onClick={() => { setActiveNavFilter(activeNavFilter === "wallet" ? null : "wallet"); addToast("Filtering by Wallet", "info"); }}
+            className={`flex items-center gap-2 hover:text-white transition-colors group ${activeNavFilter === "wallet" ? "text-white" : ""}`}
+          >
             <span className="material-symbols-outlined text-[16px] text-green-600/80 group-hover:scale-110 transition-transform">account_balance_wallet</span>
             wallet
           </button>
-          <button className="flex items-center gap-2 hover:text-white transition-colors group">
+          <button 
+            onClick={() => { setActiveNavFilter(activeNavFilter === "health" ? null : "health"); addToast("Filtering by Health", "info"); }}
+            className={`flex items-center gap-2 hover:text-white transition-colors group ${activeNavFilter === "health" ? "text-white" : ""}`}
+          >
             <span className="material-symbols-outlined text-[16px] text-pink-600/80 group-hover:scale-110 transition-transform">favorite</span>
             health
           </button>
-          <button className="flex items-center gap-2 text-purple-400/80 hover:text-white transition-colors group">
+          <button 
+            onClick={() => { setActiveNavFilter(activeNavFilter === "learning" ? null : "learning"); addToast("Filtering by Learning", "info"); }}
+            className={`flex items-center gap-2 hover:text-white transition-colors group ${activeNavFilter === "learning" ? "text-purple-400" : ""}`}
+          >
             <span className="material-symbols-outlined text-[16px] text-purple-500 group-hover:scale-110 transition-transform">cloud</span>
             learning
           </button>
@@ -315,7 +337,10 @@ export default function DashboardPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 text-[11px] text-gray-500 font-medium tracking-wide">
-                <button className="flex items-center gap-1.5 hover:text-white text-gray-300">
+                <button 
+                  onClick={() => addToast("Showing recently modified notes", "info")}
+                  className="flex items-center gap-1.5 hover:text-white text-gray-300"
+                >
                   <History className="w-4 h-4" />
                   recently
                 </button>
@@ -384,9 +409,12 @@ export default function DashboardPage() {
                 <Plus className="w-3 h-3 mr-1" />
                 new
               </Button>
-              <button className="flex items-center gap-1.5 hover:text-white text-gray-300">
+              <button 
+                onClick={() => { setShowAllProjects(!showAllProjects); addToast(showAllProjects ? "Showing recent projects" : "Showing all projects", "info"); }}
+                className="flex items-center gap-1.5 hover:text-white text-gray-300"
+              >
                 <span className="material-symbols-outlined text-[16px]">view_agenda</span>
-                all projects
+                {showAllProjects ? "recent projects" : "all projects"}
               </button>
             </div>
 
@@ -414,15 +442,24 @@ export default function DashboardPage() {
           <section className="lg:col-span-12 pt-12">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-6 text-[11px] text-gray-500 font-medium tracking-wide">
-                <button className="flex items-center gap-1.5 hover:text-white text-gray-300 underline underline-offset-4 decoration-white/20">
+                <button 
+                  onClick={() => setKnowledgeViewMode("areas")}
+                  className={`flex items-center gap-1.5 hover:text-white ${knowledgeViewMode === "areas" ? "text-gray-300 underline underline-offset-4 decoration-white/20" : ""}`}
+                >
                   <span className="material-symbols-outlined text-[16px]">grid_view</span>
                   areas
                 </button>
-                <button className="flex items-center gap-1.5 hover:text-white">
+                <button 
+                  onClick={() => setKnowledgeViewMode("disciplines")}
+                  className={`flex items-center gap-1.5 hover:text-white ${knowledgeViewMode === "disciplines" ? "text-gray-300 underline underline-offset-4 decoration-white/20" : ""}`}
+                >
                   <span className="material-symbols-outlined text-[16px]">list</span>
                   disciplines
                 </button>
-                <button className="flex items-center gap-1.5 hover:text-white">
+                <button 
+                  onClick={() => setKnowledgeViewMode("research")}
+                  className={`flex items-center gap-1.5 hover:text-white ${knowledgeViewMode === "research" ? "text-gray-300 underline underline-offset-4 decoration-white/20" : ""}`}
+                >
                   <span className="material-symbols-outlined text-[16px]">science</span>
                   research fields
                 </button>
@@ -506,20 +543,78 @@ export default function DashboardPage() {
               <Download className="w-3 h-3" />
               Export CSV
             </button>
-            <button className="hover:text-white transition-colors">GitHub</button>
-            <button className="hover:text-white transition-colors">Documentation</button>
+            <a 
+              href="https://github.com/ramlimicheal/life-os-2" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              GitHub
+            </a>
+            <a 
+              href="https://github.com/ramlimicheal/life-os-2#readme" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              Documentation
+            </a>
           </div>
         </div>
       </footer>
 
       <div className="fixed bottom-6 right-6">
         <button
-          title="Information"
+          onClick={() => setShowHelpModal(true)}
+          title="Help & Information"
           className="w-10 h-10 rounded-full bg-[#2a2a2a] border border-[#333] text-gray-400 flex items-center justify-center shadow-2xl hover:bg-purple-600 hover:text-white transition-all transform hover:scale-110 active:scale-95 text-xs font-bold"
         >
           ?
         </button>
       </div>
+
+      {showHelpModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
+          <div className="bg-[#222] border border-[#333] w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-[#333] flex justify-between items-center bg-[#282828]">
+              <h3 className="text-white font-bold">Help & Keyboard Shortcuts</h3>
+              <button onClick={() => setShowHelpModal(false)} className="text-gray-500 hover:text-white">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-white mb-2">Quick Actions</h4>
+                <ul className="text-xs text-gray-400 space-y-1">
+                  <li>Click &quot;New Note&quot; to create a note manually</li>
+                  <li>Use &quot;from command&quot; for AI-powered note creation</li>
+                  <li>Search bar supports natural language queries</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-white mb-2">Navigation</h4>
+                <ul className="text-xs text-gray-400 space-y-1">
+                  <li>Click category buttons to filter content</li>
+                  <li>Click on any note to edit it</li>
+                  <li>Use Export buttons to download your data</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-white mb-2">Need Help?</h4>
+                <p className="text-xs text-gray-400">
+                  Visit our <a href="https://github.com/ramlimicheal/life-os-2" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">GitHub repository</a> for documentation and support.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

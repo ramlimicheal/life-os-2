@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { NoteType } from "@/lib/types";
+import { useToast } from "@/components/ui/Toast";
 
 const NOTE_TYPES = [
   { value: "NOTE", label: "Note" },
@@ -37,6 +38,7 @@ interface CreateNoteModalProps {
 }
 
 export function CreateNoteModal({ isOpen, onClose, onCreated }: CreateNoteModalProps) {
+  const { addToast } = useToast();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState<NoteType>(NoteType.NOTE);
@@ -59,9 +61,13 @@ export function CreateNoteModal({ isOpen, onClose, onCreated }: CreateNoteModalP
         resetForm();
         onCreated();
         onClose();
+      } else {
+        const data = await res.json();
+        addToast(data.error || "Failed to create note", "error");
       }
     } catch (error) {
       console.error("Failed to create note:", error);
+      addToast("Failed to create note. Please try again.", "error");
     } finally {
       setIsCreating(false);
     }

@@ -1,13 +1,107 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/Toast";
 
 export default function ProfilePage() {
   const { user, isLoaded } = useUser();
+  const router = useRouter();
+  const { addToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [aiCategorization, setAiCategorization] = useState(true);
+  const [showSources, setShowSources] = useState(true);
+  const [emailDigest, setEmailDigest] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      const savedPrefs = localStorage.getItem("life2_preferences");
+      if (savedPrefs) {
+        const prefs = JSON.parse(savedPrefs);
+        setAiCategorization(prefs.aiCategorization ?? true);
+        setShowSources(prefs.showSources ?? true);
+        setEmailDigest(prefs.emailDigest ?? false);
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      const nameChanged = firstName !== (user.firstName || "") || lastName !== (user.lastName || "");
+      setHasChanges(nameChanged);
+    }
+  }, [firstName, lastName, user]);
+
+  const handleSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    
+    try {
+      await user?.update({
+        firstName: firstName,
+        lastName: lastName,
+      });
+      
+      localStorage.setItem("life2_preferences", JSON.stringify({
+        aiCategorization,
+        showSources,
+        emailDigest,
+      }));
+      
+      setHasChanges(false);
+      addToast("Profile updated successfully", "success");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      addToast("Failed to update profile", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+    }
+    setHasChanges(false);
+    addToast("Changes discarded", "info");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      return;
+    }
+    
+    if (!confirm("This will permanently delete all your notes, projects, and data. Type 'DELETE' to confirm.")) {
+      return;
+    }
+    
+    setIsDeleting(true);
+    try {
+      await user?.delete();
+      addToast("Account deleted", "info");
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+      addToast("Failed to delete account. Please try again.", "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleEditAvatar = () => {
+    addToast("Avatar editing is managed through Clerk. Click your profile picture in the header to access Clerk settings.", "info");
+  };
 
   if (!isLoaded) {
     return (
@@ -39,7 +133,11 @@ export default function ProfilePage() {
                 {user.firstName?.[0] || user.emailAddresses[0]?.emailAddress[0]?.toUpperCase()}
               </div>
             )}
-            <button className="absolute bottom-0 right-0 w-8 h-8 bg-[#252525] border border-[#333] rounded-full flex items-center justify-center hover:bg-[#333] transition-colors">
+            <button 
+              onClick={handleEditAvatar}
+              className="absolute bottom-0 right-0 w-8 h-8 bg-[#252525] border border-[#333] rounded-full flex items-center justify-center hover:bg-[#333] transition-colors"
+              title="Edit avatar"
+            >
               <span className="material-symbols-outlined text-[16px]">edit</span>
             </button>
           </div>
@@ -54,13 +152,23 @@ export default function ProfilePage() {
         </div>
 
         <div className="border-t border-[#333] pt-8 space-y-6">
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Full Name</label>
-            <Input
-              defaultValue={user.fullName || ""}
-              placeholder="Enter your name"
-              className="max-w-md"
-            />
+          <div className="grid grid-cols-2 gap-4 max-w-md">
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">First Name</label>
+              <Input
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Last Name</label>
+              <Input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last name"
+              />
+            </div>
           </div>
 
           <div>
@@ -82,7 +190,8 @@ export default function ProfilePage() {
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                defaultChecked
+                checked={aiCategorization}
+                onChange={(e) => setAiCategorization(e.target.checked)}
                 className="w-4 h-4 rounded border-[#333] bg-[#252525] text-purple-600 focus:ring-purple-500"
               />
               <span className="text-sm text-gray-300">
@@ -92,7 +201,8 @@ export default function ProfilePage() {
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                defaultChecked
+                checked={showSources}
+                onChange={(e) => setShowSources(e.target.checked)}
                 className="w-4 h-4 rounded border-[#333] bg-[#252525] text-purple-600 focus:ring-purple-500"
               />
               <span className="text-sm text-gray-300">
@@ -102,6 +212,8 @@ export default function ProfilePage() {
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
+                checked={emailDigest}
+                onChange={(e) => setEmailDigest(e.target.checked)}
                 className="w-4 h-4 rounded border-[#333] bg-[#252525] text-purple-600 focus:ring-purple-500"
               />
               <span className="text-sm text-gray-300">
@@ -112,14 +224,13 @@ export default function ProfilePage() {
         </div>
 
         <div className="border-t border-[#333] pt-8 flex justify-end gap-4">
-          <Button variant="secondary">Cancel</Button>
+          <Button variant="secondary" onClick={handleCancel} disabled={!hasChanges}>
+            Cancel
+          </Button>
           <Button
             variant="primary"
             disabled={isSaving}
-            onClick={() => {
-              setIsSaving(true);
-              setTimeout(() => setIsSaving(false), 1000);
-            }}
+            onClick={handleSave}
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
@@ -131,7 +242,9 @@ export default function ProfilePage() {
         <p className="text-sm text-gray-400 mb-4">
           Once you delete your account, there is no going back. Please be certain.
         </p>
-        <Button variant="danger">Delete Account</Button>
+        <Button variant="danger" onClick={handleDeleteAccount} disabled={isDeleting}>
+          {isDeleting ? "Deleting..." : "Delete Account"}
+        </Button>
       </div>
     </div>
   );

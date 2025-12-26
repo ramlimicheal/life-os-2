@@ -259,11 +259,11 @@ export default function AdminPage() {
                         <select
                           value={user.role}
                           onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                          className="bg-transparent text-sm text-gray-300 border-none focus:outline-none cursor-pointer"
+                          className="bg-[#1a1a1a] text-sm text-gray-300 border border-[#333] rounded px-2 py-1 focus:outline-none focus:border-purple-500 cursor-pointer"
                         >
-                          <option value="USER">User</option>
-                          <option value="ADMIN">Admin</option>
-                          <option value="SUPER_ADMIN">Super Admin</option>
+                          <option value="USER" className="bg-[#1a1a1a] text-gray-300">User</option>
+                          <option value="ADMIN" className="bg-[#1a1a1a] text-gray-300">Admin</option>
+                          <option value="SUPER_ADMIN" className="bg-[#1a1a1a] text-gray-300">Super Admin</option>
                         </select>
                       </div>
                     </td>

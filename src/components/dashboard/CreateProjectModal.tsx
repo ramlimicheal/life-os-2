@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ProjectCategory } from "@/lib/types";
+import { useToast } from "@/components/ui/Toast";
 
 const PROJECT_CATEGORIES = [
   { value: "PERSONAL", label: "Personal" },
@@ -25,6 +26,7 @@ export function CreateProjectModal({
   onClose,
   onCreated,
 }: CreateProjectModalProps) {
+  const { addToast } = useToast();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<ProjectCategory>(ProjectCategory.PERSONAL);
@@ -45,9 +47,13 @@ export function CreateProjectModal({
         resetForm();
         onCreated();
         onClose();
+      } else {
+        const data = await res.json();
+        addToast(data.error || "Failed to create project", "error");
       }
     } catch (error) {
       console.error("Failed to create project:", error);
+      addToast("Failed to create project. Please try again.", "error");
     } finally {
       setIsCreating(false);
     }

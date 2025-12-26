@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { RichTextEditor } from "@/components/editor/RichTextEditor";
 import { Note, NoteType } from "@/lib/types";
+import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
 
 const NOTE_TYPES = [
@@ -34,6 +35,7 @@ const ICONS = [
 export default function NoteDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { addToast } = useToast();
   const noteId = params.id as string;
 
   const [note, setNote] = useState<Note | null>(null);
@@ -101,9 +103,14 @@ export default function NoteDetailPage() {
         const updatedNote = await res.json();
         setNote(updatedNote);
         setHasChanges(false);
+        addToast("Note saved successfully", "success");
+      } else {
+        const data = await res.json();
+        addToast(data.error || "Failed to save note", "error");
       }
     } catch (error) {
       console.error("Failed to save note:", error);
+      addToast("Failed to save note. Please try again.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -118,10 +125,15 @@ export default function NoteDetailPage() {
     try {
       const res = await fetch(`/api/notes/${noteId}`, { method: "DELETE" });
       if (res.ok) {
+        addToast("Note deleted successfully", "success");
         router.push("/dashboard");
+      } else {
+        const data = await res.json();
+        addToast(data.error || "Failed to delete note", "error");
       }
     } catch (error) {
       console.error("Failed to delete note:", error);
+      addToast("Failed to delete note. Please try again.", "error");
     } finally {
       setIsDeleting(false);
     }
